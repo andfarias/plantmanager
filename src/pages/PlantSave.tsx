@@ -15,10 +15,10 @@ import waterdrop from '../assets/waterdrop.png';
 import { Button } from '../components/Button';
 import colors from '../styles/colors';
 import fonts from '../styles/fonts';
-import { useRoute } from '@react-navigation/core';
+import { useNavigation, useRoute } from '@react-navigation/core';
 import DateTimePicker, { Event } from '@react-native-community/datetimepicker';
 import { format, isBefore } from 'date-fns';
-import { PlantProps } from '../libs/storage';
+import { PlantProps, savePlant } from '../libs/storage';
 
 interface Params {
   plant: PlantProps
@@ -30,12 +30,13 @@ export function PlantSave() {
 
   const route = useRoute();
   const { plant } = route.params as Params;
+  const navigation = useNavigation();
 
   function handleChangeTime(event: Event, dateTime: Date | undefined) {
     if (Platform.OS === 'android') {
       setShowDateTime(oldState => !oldState);
-      
     }
+
     if (dateTime && isBefore(dateTime, new Date())) {
       setSelectedDateTime(new Date());
       return Alert.alert("Escolha uma data futura! 🤷‍♀️");
@@ -47,6 +48,26 @@ export function PlantSave() {
 
   function handleOpenDateTimePickerForAndroid() {
     setShowDateTime(oldState => !oldState);
+  }
+
+  async function handleSave() {
+    try {
+      await savePlant({
+        ...plant,
+        dateTimeNotification: selectedDateTime
+      });
+
+      navigation.navigate('Confirmation', {
+        title: 'Tudo certo',
+        subtitle: 'Fique tranquilo que sempre vamos lembrar você de cuidar das suas plantinhas com muito cuidado.',
+        buttonTitle: 'Muito Obrigado :D',
+        icon: 'hug',
+        nextScreen: 'MyPlants'
+      });
+
+    } catch {
+      Alert.alert('Não foi possível salvar. 😢');
+    }
   }
 
   return (
@@ -88,7 +109,7 @@ export function PlantSave() {
         {
           Platform.OS === 'android' && (
             <TouchableOpacity onPress={handleOpenDateTimePickerForAndroid}
-            style={styles.dataTimePickerButton}>
+              style={styles.dataTimePickerButton}>
               <Text style={styles.dataTimePickerText}>
                 {`Mudar ${format(selectedDateTime, 'HH:mm')}`}
               </Text>
@@ -96,7 +117,7 @@ export function PlantSave() {
           )
         }
 
-        <Button title="Cadastrar Planta" onPress={() => { }} />
+        <Button title="Cadastrar Planta" onPress={handleSave} />
 
       </View>
     </View>
