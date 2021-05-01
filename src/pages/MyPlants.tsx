@@ -1,30 +1,55 @@
 import React, { useEffect, useState } from 'react';
 import {
-    StyleSheet,
-    View,
-    Text,
-    Image,
-    FlatList
+  StyleSheet,
+  View,
+  Text,
+  Image,
+  FlatList,
+  Alert
 } from 'react-native';
 import { Header } from '../components/Header';
 import colors from '../styles/colors';
 
 import waterdrop from '../assets/waterdrop.png';
-import { loadPlant, PlantProps } from '../libs/storage';
+import { loadPlant, PlantProps, removePlant } from '../libs/storage';
 import { formatDistance } from 'date-fns';
 import { pt } from 'date-fns/locale';
 import fonts from '../styles/fonts';
 import { PlantCardSecondary } from '../components/PlantCardSecondary';
+import { Load } from '../components/Load';
 
 export function MyPlants() {
   const [myPlants, setMyPlants] = useState<PlantProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [nextWaterd, setNextWaterd] = useState<string>();
 
+  function handleRemove(plant: PlantProps) {
+    Alert.alert('Remover', `Deseja remover a ${plant.name}?`, [
+      {
+        text: 'Não 🙏',
+        style: 'cancel'
+      }, {
+        text: 'Sim 💪',
+        onPress: async () => {
+          try {
+            await removePlant(plant.id);
+
+            setMyPlants((oldData) =>
+              oldData.filter((item) => item.id != plant.id)
+            );
+
+          } catch (error) {
+            Alert.alert("Não foi possível remover! 😥");
+          }
+        }
+      }
+    ]);
+  }
+
   useEffect(() => {
     async function loadStorageData() {
       const plantsStoraged = await loadPlant();
-      
+
       const nextTime = formatDistance(
         new Date(plantsStoraged[0].dateTimeNotification).getTime(),
         new Date().getTime(),
@@ -41,19 +66,21 @@ export function MyPlants() {
 
     loadStorageData();
 
-  },[])
+  }, [])
 
+  if (loading)
+    return <Load />
   return (
     <View style={styles.container}>
       <Header />
 
       <View style={styles.spotlight}>
         <Image source={waterdrop}
-               style={styles.spotlightImage} />
-        
+          style={styles.spotlightImage} />
+
         <Text style={styles.spotlightText}>
           {nextWaterd}
-        </Text>        
+        </Text>
       </View>
 
       <View style={styles.plant}>
@@ -61,11 +88,11 @@ export function MyPlants() {
           Proxímas regadas
         </Text>
 
-        <FlatList 
+        <FlatList
           data={myPlants}
-          keyExtractor={( item ) => String(item.id) }
+          keyExtractor={(item) => String(item.id)}
           renderItem={({ item }) => (
-            <PlantCardSecondary data={item} />
+            <PlantCardSecondary data={item} handleRemove={() => { handleRemove(item) }} />
           )}
           showsVerticalScrollIndicator={false}
         />
