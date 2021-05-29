@@ -1,9 +1,9 @@
 # Plantmanager 🌱
 
-# 📝 About
+## 📝 About
 This project was developed during the Next Level Week workshops by Rocketseat.
 
-# 🚀 Technologies
+## 🚀 Technologies
 * [Expo](https://expo.io/)
 * [React Native](https://reactnative.dev/)
 * [TypeScript](https://www.typescriptlang.org/)
@@ -15,7 +15,7 @@ This project was developed during the Next Level Week workshops by Rocketseat.
 * [date-fns](https://date-fns.org/)
 * [react-native-svg](https://docs.expo.io/versions/latest/sdk/svg/)
 
-## Images
+## 📲 Images
 ![image](https://user-images.githubusercontent.com/42558999/120077269-f5136280-c07f-11eb-8c19-43f5ce6b7460.png)
 ![image](https://user-images.githubusercontent.com/42558999/120077290-1ffdb680-c080-11eb-8b5f-f6668a2b094a.png)
 ![image](https://user-images.githubusercontent.com/42558999/120077302-360b7700-c080-11eb-990a-ec43798f0dab.png)
